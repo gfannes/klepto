@@ -1,0 +1,3 @@
+- ESP-NOW is a wireless protocol between ESP-WROOM-32 MCUs
+	- 600m range
+	- [ ] Test this
