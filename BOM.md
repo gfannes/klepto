@@ -1,12 +1,10 @@
-- Arduino nano or uno or ESP-WROOM-32
-- NRF24L01
-	- Capacitors for stable power?
-- DC motor 130 size
-	- 100nF capacitor over motor
-- Driving motors
-	- MG996R converted servo motors
-- Belts
-- Rubber bands for tension between middle bogie and main body
+# Per rover
+- Control board
+- Battery pack
+- 2x DC motor 130 size
+- 100nF capacitor for over motor
+- Rubber bands
+- Stemfie screwdriver
 
 # Werkgerief
 - Dremel

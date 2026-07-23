@@ -21,7 +21,7 @@
 - Draws upto 2A per motor peak
 - Using 5xAA (only rechargeable) works without buck convertor
 	- AI suggests to add 2 power diodes an capacitors, seems not necessary
-- [ ] Can we control the speed of a MG996R via its signal?
+- [x] Can we control the speed of a MG996R via its signal? yes
 1000 µs → full speed left
 1400 µs → slow left
 1500 µs → stop

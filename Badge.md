@@ -1,0 +1,3 @@
+- Info van de badge: https://github.com/Fri3dCamp/badge_2026_hw 
+- Documentatie: https://fri3dcamp.github.io/badge_2026/
+- Contact: Wim Van Gool wim@fri3d.be of badge@fri3d.be

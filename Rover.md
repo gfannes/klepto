@@ -1,28 +1,13 @@
-&b
+&#5
 
-# Chasis
-- Based on [[Stemfie]]
 # Suspension
 - Rocker-bogie suspension of Mars rover
 	- Diff with ropes: at 5min in https://www.youtube.com/watch?v=ern5a-jvdxY&t=332s
 	- https://www.youtube.com/watch?v=dts8WvfQUDg
-- Averaging suspension
-	-
-# STEMFIE
-- https://github.com/Cantareus/Stemfie_OpenSCAD
-# Nerf turret
-- https://www.youtube.com/watch?v=3Ma5ZCZVQRs
-- https://www.youtube.com/watch?v=ZnJ6_IrmszU
-# Comms
-- [/] Check comms capability
-- Arduino + NRF24L01: https://www.youtube.com/watch?v=7rcVeFFHcFM
-- Issues with NRF24L01: https://www.youtube.com/watch?v=Z7_Cy66Vnrc
-- https://www.instructables.com/NRF24L01-Tutorial-Arduino-Wireless-Communication/
-- https://howtomechatronics.com/projects/diy-arduino-rc-transmitter/
-# Nerf cannon with fuel
-- https://makerworld.com/en/models/2179007-alcohol-nerf-cannon#profileId-2364657
+	- Too complex, couple front and rear wheel with rubber band to create basic suspension
 
 # Parts
+- [ ] Make complete rover body
 - 2x 5x9 square
 - 4x 3 beam thread with only middle hole
 - 2x 13 beam
@@ -30,7 +15,7 @@
 - 2x T1 wheel fixer
 - 2x T1 motor mount
 - 4x angle bracket
-	- bit smaller
+	- [ ] bit smaller to avoid hindering the base plate
 - 4x poullies
 - 2x4 1.5U screw and nut
 - 2x axle fixer
@@ -46,6 +31,7 @@
 - Profile: 12.8x5.4 4x4.4 from bottom
 
 # Wheel fixer
+- [?] How can we fix the wheel to the fixer
 - Outer cylinder 12.5
 - 4 cuts with cylinder 10 with center at distance 10
 - Depth Wheel: 9
@@ -54,3 +40,11 @@
 - Axle smallhole: 2 => 2.2
 - Length: 8+9
 - Fillet
+
+# STEMFIE
+- https://github.com/Cantareus/Stemfie_OpenSCAD
+
+# Ledger
+## Prototype 2026-06-10
+- [ ] 5xAA NiMH works but is depleted after 10min, either due to the MG996R or the battery pack being too old. Test this.
+- [ ] Rubber bands are necessary for the wheels to have enough grip. Test with TPU and hotglue.

@@ -13,3 +13,10 @@
 	- IRLB8748PBF (very low RDS(on), overkill but excellent)
 	- IRL540 works but get a bit hotter
 	- Better not use a TIP120 darlington NPN since that loses 1V
+
+# Nerf cannon with fuel
+- https://makerworld.com/en/models/2179007-alcohol-nerf-cannon#profileId-2364657
+
+# Nerf turret
+- https://www.youtube.com/watch?v=3Ma5ZCZVQRs
+- https://www.youtube.com/watch?v=ZnJ6_IrmszU
