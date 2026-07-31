@@ -32,6 +32,7 @@
 
 # Wheel fixer
 - [?] How can we fix the wheel to the fixer
+	- Hotglue?
 - Outer cylinder 12.5
 - 4 cuts with cylinder 10 with center at distance 10
 - Depth Wheel: 9
