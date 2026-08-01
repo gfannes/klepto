@@ -130,12 +130,14 @@ void loop() {
     // left = -left;
     right = -right;
 
-    Serial.print(left);
-    Serial.print(' ');
-    Serial.print(right);
-    Serial.print(' ');
-    Serial.println("");
-
+    if (false) {
+      Serial.print(left);
+      Serial.print(' ');
+      Serial.print(right);
+      Serial.print(' ');
+      Serial.println("");
+    }
+    
     const int max_speed = 200;
     rover.drive(left * max_speed, right * max_speed);
   }
