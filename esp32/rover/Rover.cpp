@@ -47,11 +47,15 @@ void Rover::shoot() {
   delay(1000);
   servo_shoot.attach(servo_shoot_pin, 500, 2400);
   servo_shoot.write(70);
+  servo_tilt.attach(servo_shoot_pin, 500, 2400);
+  servo_tilt.write(20);
   delay(500);
   servo_shoot.write(0);
+  servo_tilt.write(0);
   digitalWrite(flywheel_pin, LOW);
   delay(500);
   servo_shoot.detach();
+  servo_tilt.detach();
 }
 
 void Rover::drive(int l, int r) {
