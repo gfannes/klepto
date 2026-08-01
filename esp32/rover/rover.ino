@@ -77,8 +77,11 @@ void setup() {
   WiFi.mode(WIFI_STA);
   WiFi.disconnect();
   WiFi.setSleep(false);
-  Serial.print("Sender MAC: ");
-  Serial.println(WiFi.macAddress());
+
+  uint8_t macRaw[6];
+  esp_read_mac(macRaw, ESP_MAC_WIFI_STA);
+  Serial.printf("Receiver MAC: %02X:%02X:%02X:%02X:%02X:%02X\n",
+              macRaw[0], macRaw[1], macRaw[2], macRaw[3], macRaw[4], macRaw[5]);
 
   if (esp_now_init() != ESP_OK) {
     Serial.println("ESP-NOW init failed");
@@ -113,6 +116,12 @@ void loop() {
     rover.drive(0, 0);
     rover.shoot();
   } else {
+
+    if (pkt.x)
+      rover.tilt_up();
+    if (pkt.b)
+      rover.tilt_down();
+
     const auto forward = normalize(pkt.joyX);
     const auto steer = normalize(pkt.joyY);
 

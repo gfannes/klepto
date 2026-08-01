@@ -23,6 +23,8 @@ void Rover::setup() {
   const bool ok4 = ledcAttach(motor_b_in2, pwm_freq, pwm_res);
   Serial.printf("Motor ledcAttach: %d %d %d %d\n", ok1, ok2, ok3, ok4);  
 
+  tilt_degrees = 0;
+
   stop();
 }
 
@@ -31,15 +33,25 @@ void Rover::shoot() {
   delay(1000);
   servo_shoot.attach(servo_shoot_pin, 500, 2400);
   servo_shoot.write(70);
-  servo_tilt.attach(servo_tilt_pin, 500, 2400);
-  servo_tilt.write(20);
   delay(500);
   servo_shoot.write(0);
-  servo_tilt.write(0);
   digitalWrite(flywheel_pin, LOW);
   delay(500);
   servo_shoot.detach();
-  servo_tilt.detach();
+}
+
+
+
+void Rover::tilt_up()
+{
+  tilt_degrees = constrain(tilt_degrees + tilt_degrees_per_update, 0, 70);
+  servo_tilt.write(tilt_degrees);
+}
+  
+void Rover::tilt_down()
+{
+  tilt_degrees = constrain(tilt_degrees - tilt_degrees_per_update, 0, 70);
+  servo_tilt.write(tilt_degrees);
 }
 
 void Rover::drive(int l, int r) {
@@ -60,6 +72,9 @@ void Rover::drive_(int in1, int in2, int speed) {
 
 void Rover::stop() {
   digitalWrite(flywheel_pin, LOW);
+  
+  tilt_degrees = 0;
+  servo_tilt.write(tilt_degrees);
 
   ledcWrite(motor_a_in1, 0);
   ledcWrite(motor_a_in2, 0);
