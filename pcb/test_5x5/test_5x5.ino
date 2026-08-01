@@ -11,7 +11,7 @@ constexpr uint8_t T1_B_IN2 = 19;
 constexpr uint8_t SERVO_1_PIN = 27;
 constexpr uint8_t SERVO_2_PIN = 14;
 
-constexpr unsigned long MOTOR_TEST_MS = 1500;
+constexpr unsigned long MOTOR_TEST_MS = 2000;
 constexpr unsigned long PAUSE_MS = 750;
 
 Servo servo1;
@@ -30,9 +30,11 @@ void stopAllMotors()
 void testDC130Motor()
 {
     Serial.println("DC130 motor: ON");
-    analogWrite(DC130_PIN, 255);
+    // analogWrite(DC130_PIN, 255);
+    digitalWrite(DC130_PIN, HIGH);
     delay(MOTOR_TEST_MS);
-    analogWrite(DC130_PIN, 0);
+    // analogWrite(DC130_PIN, 0);
+    digitalWrite(DC130_PIN, LOW);
     Serial.println("DC130 motor: OFF");
     delay(PAUSE_MS);
 }

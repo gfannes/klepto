@@ -49,3 +49,4 @@
 ## Prototype 2026-06-10
 - [ ] 5xAA NiMH works but is depleted after 10min, either due to the MG996R or the battery pack being too old. Test this.
 - [ ] Rubber bands are necessary for the wheels to have enough grip. Test with TPU and hotglue.
+	- [?] Two temp filament
