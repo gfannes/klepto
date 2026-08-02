@@ -24,10 +24,10 @@
      inkscape:deskcolor="#d1d1d1"
      inkscape:document-units="mm"
      showgrid="true"
-     inkscape:zoom="7.3942157"
-     inkscape:cx="325.72758"
-     inkscape:cy="335.0592"
-     inkscape:window-width="1319"
+     inkscape:zoom="2.252093"
+     inkscape:cx="356.11319"
+     inkscape:cy="404.73462"
+     inkscape:window-width="1280"
      inkscape:window-height="800"
      inkscape:window-x="0"
      inkscape:window-y="0"
@@ -1770,7 +1770,7 @@
        width="0" />
     <g
        id="g31"
-       transform="rotate(-0.36911157,-4814.7431,-86.302189)"
+       transform="rotate(-0.36911157,-1855.7946,119.3798)"
        inkscape:transform-center-x="-0.0049188826"
        inkscape:transform-center-y="-0.011329498">
       <rect
@@ -1797,7 +1797,7 @@
     </g>
     <g
        id="g31-5"
-       transform="rotate(-179.99989,115.56998,104.03999)">
+       transform="rotate(-179.99989,115.56998,104.13999)">
       <rect
          style="fill:#ff00ff;stroke:#000000;stroke-width:0.3;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1"
          id="rect29-9"
@@ -1929,7 +1929,7 @@
     </g>
     <g
        id="g44"
-       transform="rotate(90.00006,81.448255,109.08449)">
+       transform="rotate(-89.506007,65.985016,73.506034)">
       <rect
          style="fill:none;fill-opacity:1;stroke:#000000;stroke-width:0.3;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1"
          id="rect37"
@@ -2652,9 +2652,10 @@
     </g>
     <g
        id="g62"
-       transform="rotate(89.999913,89.535008,117.47504)">
+       transform="rotate(89.999913,88.265012,118.74505)">
       <g
-         id="g63">
+         id="g63"
+         transform="translate(-2.5400027)">
         <rect
            style="fill:#ff00ff;fill-opacity:1;stroke:none;stroke-width:0.3;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1"
            id="rect61"
@@ -2709,7 +2710,7 @@
     </g>
     <g
        id="g48-3"
-       transform="rotate(-90.000078,100.33,78.740002)">
+       transform="rotate(-90.000078,100.33,80.009997)">
       <ellipse
          style="fill:#f9f9f9;fill-opacity:1;stroke:#000000;stroke-width:0.3;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1"
          id="path46-5"
@@ -2873,8 +2874,9 @@
        sodipodi:nodetypes="cc" />
     <path
        style="fill:none;stroke:#ff00ff;stroke-width:0.6;stroke-dasharray:none;stroke-opacity:1"
-       d="m 106.68,88.899996 h 7.62 V 100.33 h -7.62 v 13.97 h 5.08 l 0,2.53999"
-       id="path18" />
+       d="m 114.3,101.6 c -0.73196,5.94205 -2.54,9.23599 -2.54,15.23999"
+       id="path18"
+       sodipodi:nodetypes="cc" />
     <path
        style="fill:none;stroke:#ff00ff;stroke-width:0.499999;stroke-dasharray:none;stroke-opacity:1"
        d="m 111.76,121.91999 -10.16,12.7"
@@ -2885,8 +2887,9 @@
        id="path20" />
     <path
        style="fill:none;stroke:#552200;stroke-width:0.4;stroke-dasharray:none;stroke-opacity:1"
-       d="M 104.14,88.899996 H 114.3 V 100.33 h -5.08 l 0,13.97"
-       id="path22" />
+       d="M 88.900001,88.899996 H 111.76 l 0,22.860004"
+       id="path22"
+       sodipodi:nodetypes="ccc" />
     <path
        style="fill:none;stroke:#4d4d4d;stroke-width:0.600001;stroke-dasharray:none;stroke-opacity:1"
        d="m 76.200008,89.150469 v -7.87047"
@@ -2909,9 +2912,22 @@
        d="m 63.499999,93.979994 -2.54,40.639996"
        id="path27" />
     <path
-       style="fill:#ffd42a;stroke-width:0.264583;stroke:#ffd42a;stroke-opacity:1"
-       d="m 86.360002,88.882579 h 7.652773"
-       id="path2" />
+       style="fill:#ffd42a;stroke:#ffd42a;stroke-width:0.264583;stroke-opacity:1"
+       d="m 86.360002,88.882579 -10e-7,-7.602583"
+       id="path2"
+       sodipodi:nodetypes="cc" />
+    <rect
+       style="fill:#ffd42a;stroke:#1a1a1a;stroke-width:0.265;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1"
+       id="rect2"
+       width="2.5400007"
+       height="7.6200018"
+       x="115.57"
+       y="100.32999" />
+    <path
+       style="fill:#ff00ff;stroke:#ff00ff;stroke-width:0.6;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1"
+       d="m 114.3,86.359996 2.54,12.7"
+       id="path3"
+       sodipodi:nodetypes="cc" />
   </g>
   <g
      inkscape:groupmode="layer"
