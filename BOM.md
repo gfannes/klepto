@@ -7,6 +7,8 @@
 - Stemfie screwdriver
 
 # Werkgerief
-- Dremel
-- Laptop with Arduino-v2
-- Scope
+- [ ] Dremel
+- [ ] Laptop with Arduino-v2
+- [ ] Boor 2mm 7mm
+- [ ] Rekkers
+- [ ] Lijmpistool
