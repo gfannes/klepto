@@ -28,15 +28,23 @@ void Rover::setup() {
   stop();
 }
 
-void Rover::shoot() {
+
+
+void Rover::shoot(unsigned int shoot) {
   digitalWrite(flywheel_pin, HIGH);
-  delay(1000);
   servo_shoot.attach(servo_shoot_pin, 500, 2400);
-  servo_shoot.write(70);
-  delay(500);
-  servo_shoot.write(0);
+  delay(1000);
+
+  for(unsigned int i = 0; i < shoot; ++i)
+  {
+    servo_shoot.write(70);
+    delay(100);
+    servo_shoot.write(0);
+    delay(100);
+  }
+
   digitalWrite(flywheel_pin, LOW);
-  delay(500);
+  delay(250);
   servo_shoot.detach();
 }
 
@@ -54,19 +62,42 @@ void Rover::tilt_down()
   servo_tilt.write(tilt_degrees);
 }
 
-void Rover::drive(int l, int r) {
+void Rover::drive(float l, float r) {
+
   drive_(motor_a_in1, motor_a_in2, l);
   drive_(motor_b_in1, motor_b_in2, r);
 }
 
-void Rover::drive_(int in1, int in2, int speed) {
-  speed = constrain(speed, -255, 255);
-  if (speed >= 0) {
+
+
+void Rover::drive_(int in1, int in2, float speed) {
+
+
+  const float dead_zone = 0.1;
+  if (fabs(speed) < dead_zone)
+  {
     ledcWrite(in1, 0);
-    ledcWrite(in2, speed);
-  } else {
-    ledcWrite(in1, -speed);
     ledcWrite(in2, 0);
+  }
+  else
+  {
+    // we remap so that 0 -> min_pwm_value and 1 -> max_pwm_value
+    const int min_pwm_value = 150;
+    const int max_pwm_value = 255;
+
+    if (speed >= 0)
+    {
+      int mapped_value = constrain(min_pwm_value + speed * (max_pwm_value - min_pwm_value), -max_pwm_value, max_pwm_value);
+      ledcWrite(in1, 0);
+      ledcWrite(in2, mapped_value);
+    }
+    else
+    {
+      int mapped_value = constrain(min_pwm_value + -speed * (max_pwm_value - min_pwm_value), -max_pwm_value, max_pwm_value);
+      ledcWrite(in1, mapped_value);
+      ledcWrite(in2, 0);
+
+    }
   }
 }
 

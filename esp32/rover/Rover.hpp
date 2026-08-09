@@ -8,8 +8,8 @@ class Rover
 {
 public:
     void setup();
-    void drive(int l, int r);
-    void shoot();
+    void drive(float l, float r);
+    void shoot(unsigned int count);
     void stop();
     void tilt_up();
     void tilt_down();
@@ -40,7 +40,7 @@ private:
     Servo servo_shoot;
     int tilt_degrees;
 
-    void drive_(int in1, int in2, int speed);
+    void drive_(int in1, int in2, float speed);
 };
 
 #endif

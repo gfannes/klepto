@@ -109,12 +109,16 @@ void loop() {
     return;
   }
 
-  const bool shoot = pkt.a;
+  unsigned int to_shoot = 0;
+  if (pkt.a)
+    to_shoot = 1;
+  if(pkt.y)
+    to_shoot = 3;
 
-  if (shoot) {
+  if (to_shoot) {
     Serial.println("shoot");
     rover.drive(0, 0);
-    rover.shoot();
+    rover.shoot(to_shoot);
   } else {
 
     if (pkt.x)
@@ -147,7 +151,6 @@ void loop() {
       Serial.println("");
     }
     
-    const int max_speed = 200;
-    rover.drive(left * max_speed, right * max_speed);
+    rover.drive(left, right);
   }
 }
