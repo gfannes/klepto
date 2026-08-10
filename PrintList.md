@@ -7,7 +7,7 @@
 
 # Geert
 - [/] 6x 6x9x1 plate (4)
-- [/] 6x 5x9x1 plate (1)
+- [/] 6x 5x9x1 plate (3)
 - [/] 24x 3x4 L-beam (14)
 - [/] 48x 4x1x1 I-beam (16)
 - [/] 12x 11x1 T-beam (4)
