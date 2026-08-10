@@ -6,7 +6,9 @@
 #include "Fri3dBadge_Button.h"
 
 // Receiver's MAC: 08:D1:F9:CB:F9:CC
-uint8_t peerAddress[] = {0x08, 0xD1, 0xF9, 0xCB, 0xF9, 0xCC};
+// B0:CB:D8:89:75:E8
+
+uint8_t peerAddress[] = {0xB0, 0xCB, 0xD8, 0x89, 0x75, 0xE8};
 
 typedef struct __attribute__((packed)) {
   int16_t joyX;
