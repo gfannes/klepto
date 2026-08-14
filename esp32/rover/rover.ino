@@ -2,10 +2,13 @@
 #include <Rover.hpp>
 #include <WiFi.h>
 #include <esp_now.h>
+#include <esp_wifi.h>
 
 Rover rover;
 
 #define BADGE_TEAM 1
+const int ESPNOW_CHANNEL = 1;
+const bool PAIR_FIRST_BADGE = true;
 
 #if BADGE_TEAM == 0
 // 34:85:18:AB:CF:38
@@ -33,6 +36,8 @@ BadgeInput prevPacket = {2048, 2048, 0, 0, 0, 0};
 volatile bool newData = false;
 unsigned long lastSeen = 0;
 const unsigned long FAILSAFE_MS = 500;
+uint8_t paired_badge_mac[6] = {};
+bool hasPairedBadge = false;
 
 bool macEquals(const uint8_t *a, const uint8_t *b) {
   for (int i = 0; i < 6; ++i)
@@ -41,11 +46,33 @@ bool macEquals(const uint8_t *a, const uint8_t *b) {
   return true;
 }
 
+void printMac(const char *label, const uint8_t *mac) {
+  Serial.printf("%s%02X:%02X:%02X:%02X:%02X:%02X",
+                label, mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
+}
+
 void handlePacket(const uint8_t *mac, const uint8_t *data, int len) {
-  if (!macEquals(mac, badge_mac))
+
+  if (len != sizeof(BadgeInput)) {
+    printMac("Ignoring packet with wrong size from ", mac);
+    Serial.printf(": got %d bytes, expected %u\n", len, (unsigned)sizeof(BadgeInput));
     return;
-  if (len != sizeof(BadgeInput))
+  }
+
+  if (!hasPairedBadge && PAIR_FIRST_BADGE) {
+    memcpy(paired_badge_mac, mac, sizeof(paired_badge_mac));
+    hasPairedBadge = true;
+    printMac("Paired badge ", paired_badge_mac);
+    Serial.println();
+  }
+
+  if (!hasPairedBadge || !macEquals(mac, paired_badge_mac)) {
+    printMac("Ignoring packet from ", mac);
+    printMac(", expected ", paired_badge_mac);
+    Serial.println();
     return;
+  }
+
   memcpy((void *)&received_packet, data, sizeof(BadgeInput));
   newData = true;
 }
@@ -78,13 +105,22 @@ void setup() {
   WiFi.mode(WIFI_STA);
   WiFi.disconnect();
   WiFi.setSleep(false);
+  esp_err_t channelResult = esp_wifi_set_channel(ESPNOW_CHANNEL, WIFI_SECOND_CHAN_NONE);
 
   uint8_t macRaw[6];
   esp_read_mac(macRaw, ESP_MAC_WIFI_STA);
-  Serial.printf("Rover MAC: %02X:%02X:%02X:%02X:%02X:%02X\n",
-              macRaw[0], macRaw[1], macRaw[2], macRaw[3], macRaw[4], macRaw[5]);
-  Serial.printf("Badge MAC: %02X:%02X:%02X:%02X:%02X:%02X\n",
-              badge_mac[0], badge_mac[1], badge_mac[2], badge_mac[3], badge_mac[4], badge_mac[5]);
+  printMac("Rover MAC: ", macRaw);
+  Serial.println();
+  if (PAIR_FIRST_BADGE) {
+    Serial.println("Badge pairing: first valid 8-byte ESP-NOW packet wins");
+  } else {
+    memcpy(paired_badge_mac, badge_mac, sizeof(paired_badge_mac));
+    hasPairedBadge = true;
+    printMac("Badge MAC: ", paired_badge_mac);
+    Serial.println();
+  }
+  Serial.printf("ESP-NOW channel: %d (%s)\n",
+                ESPNOW_CHANNEL, channelResult == ESP_OK ? "ok" : "set failed");
   
   if (esp_now_init() != ESP_OK) {
     Serial.println("ESP-NOW init failed");

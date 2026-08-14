@@ -8,11 +8,10 @@ import binascii
 import struct
 import time
 
-wlan = network.WLAN(network.STA_IF)
-wlan.active(True)
-
-PEER_MAC = "B0CBD88975E8"
+# PEER_MAC = "B0CBD88975E8"
 # PEER_MAC = "B0CBD88975E9"
+PEER_MAC = "D4E9F4E6B754"
+ESP_NOW_CHANNEL = 1
 CENTER = 2048
 MIN_AXIS = 0
 MAX_AXIS = 4095
@@ -23,6 +22,33 @@ BUTTON_KEYS = {
     10: "a",  # A button: shoot
     3: "y",  # S button: double shoot control; current rover firmware shoots 3
 }
+
+wlan = network.WLAN(network.STA_IF)
+
+
+def setup_wifi_for_espnow():
+    try:
+        network.WLAN(network.AP_IF).active(False)
+    except Exception:
+        pass
+
+    wlan.active(False)
+    wlan.active(True)
+    try:
+        wlan.disconnect()
+    except Exception:
+        pass
+    try:
+        wlan.config(pm=wlan.PM_NONE)
+    except Exception:
+        pass
+    try:
+        wlan.config(channel=ESP_NOW_CHANNEL)
+    except Exception:
+        pass
+
+
+setup_wifi_for_espnow()
 
 def ticks_ms():
     if hasattr(time, "ticks_ms"):
@@ -82,7 +108,10 @@ class Main(Activity):
             e.active(True)
 
             peer = binascii.unhexlify(PEER_MAC)
-            e.add_peer(peer)
+            try:
+                e.add_peer(peer, channel=ESP_NOW_CHANNEL)
+            except TypeError:
+                e.add_peer(peer)
         except Exception as exc:
             label.set_text("Robot offline")
             status.set_text("Cannot add ESP-NOW peer\n%s" % exc)
