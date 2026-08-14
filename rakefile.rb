@@ -5,3 +5,8 @@ task :upload do
     sleep 0.5
     sh "mpremote exec \"from mpos import AppManager; AppManager.start_app('com.fannes.klepto')\""
 end
+task :run do
+    sh 'mpremote exec "from mpos import AppManager; AppManager.restart_launcher()"'
+    sleep 0.5
+    sh "mpremote exec \"from mpos import AppManager; AppManager.start_app('com.fannes.klepto')\""
+end

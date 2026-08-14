@@ -12,6 +12,7 @@ wlan = network.WLAN(network.STA_IF)
 wlan.active(True)
 
 PEER_MAC = "B0CBD88975E8"
+# PEER_MAC = "B0CBD88975E9"
 CENTER = 2048
 MIN_AXIS = 0
 MAX_AXIS = 4095
@@ -72,6 +73,10 @@ class Main(Activity):
         key_label.align(lv.ALIGN.CENTER, 0, 28)
         key_label.set_text("key: -")
 
+        send_label = lv.label(screen)
+        send_label.align(lv.ALIGN.CENTER, 0, 44)
+        send_label.set_text("sent: 0 tx: 0 fail: 0")
+
         try:
             e = espnow.ESPNow()
             e.active(True)
@@ -89,6 +94,9 @@ class Main(Activity):
         button_expires = {"a": 0, "b": 0, "x": 0, "y": 0}
         buttons = {"a": 0, "b": 0, "x": 0, "y": 0}
         last_packet = None
+        send_count = 0
+        tx_count = 0
+        fail_count = 0
 
         def make_packet():
             return struct.pack(
@@ -112,16 +120,28 @@ class Main(Activity):
             )
 
         def send_state(force=False):
-            nonlocal last_packet
+            nonlocal last_packet, send_count, tx_count, fail_count
             packet = make_packet()
+            changed = packet != last_packet
             if not force and packet == last_packet:
                 return
             try:
-                e.send(peer, packet)
+                delivered = e.send(peer, packet)
             except Exception as exc:
+                fail_count += 1
+                send_label.set_text("sent: %d tx: %d fail: %d" % (send_count, tx_count, fail_count))
                 status.set_text("Send failed\n%s" % exc)
                 return
+            if delivered is False:
+                fail_count += 1
+                send_label.set_text("sent: %d tx: %d fail: %d" % (send_count, tx_count, fail_count))
+                status.set_text("No rover ACK")
+                return
             last_packet = packet
+            tx_count += 1
+            if changed:
+                send_count += 1
+            send_label.set_text("sent: %d tx: %d fail: %d" % (send_count, tx_count, fail_count))
             status.set_text(describe_state())
 
         def update_buttons():
