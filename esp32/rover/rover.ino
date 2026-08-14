@@ -15,7 +15,7 @@ typedef struct __attribute__((packed)) {
   uint8_t a;
   uint8_t b;
   uint8_t x;
-  uint8_t y;
+  uint8_t s;
   uint8_t roverId;
 } BadgeInput;
 
@@ -121,11 +121,11 @@ void loop() {
   }
 
   if (pkt.roverId != prevPacket.roverId || pkt.a != prevPacket.a || pkt.b != prevPacket.b ||
-      pkt.x != prevPacket.x || pkt.y != prevPacket.y || pkt.joyX != prevPacket.joyX ||
+      pkt.x != prevPacket.x || pkt.s != prevPacket.s || pkt.joyX != prevPacket.joyX ||
       pkt.joyY != prevPacket.joyY)
   {
-    Serial.printf("joyX:%d joyY:%d a:%u b:%u x:%u y:%u id:%c idByte:%u\n",
-                  pkt.joyX, pkt.joyY, pkt.a, pkt.b, pkt.x, pkt.y,
+    Serial.printf("joyX:%d joyY:%d a:%u b:%u x:%u s:%u id:%c idByte:%u\n",
+                  pkt.joyX, pkt.joyY, pkt.a, pkt.b, pkt.x, pkt.s,
                   (char)pkt.roverId, pkt.roverId);
     memcpy(&prevPacket, (const void *)&pkt, sizeof(pkt));
   }
@@ -134,7 +134,7 @@ void loop() {
   unsigned int to_shoot = 0;
   if (pkt.a)
     to_shoot = 1;
-  if(pkt.y)
+  if(pkt.s)
     to_shoot = 3;
 
   if (to_shoot) {

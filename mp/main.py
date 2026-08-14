@@ -20,7 +20,7 @@ SELECT_HOLD_MS = 1500
 BUTTON_KEYS = {
     10: "a",  # A button: shoot
     13: "a",
-    3: "y",  # S button: double shoot control; current rover firmware shoots 3
+    3: "s",  # S button: double shoot control
 }
 
 wlan = network.WLAN(network.STA_IF)
@@ -121,8 +121,8 @@ class Main(Activity):
         select_expires = ticks_ms() + SELECT_HOLD_MS
         axes = {"forward": CENTER, "steer": CENTER}
         axis_expires = {"forward": 0, "steer": 0}
-        button_expires = {"a": 0, "b": 0, "x": 0, "y": 0}
-        buttons = {"a": 0, "b": 0, "x": 0, "y": 0}
+        button_expires = {"a": 0, "b": 0, "x": 0, "s": 0}
+        buttons = {"a": 0, "b": 0, "x": 0, "s": 0}
         last_packet = None
         send_count = 0
         tx_count = 0
@@ -150,7 +150,7 @@ class Main(Activity):
                 buttons["a"],
                 buttons["b"],
                 buttons["x"],
-                buttons["y"],
+                buttons["s"],
                 ord(selected_rover_id()),
             )
 
@@ -160,7 +160,7 @@ class Main(Activity):
                 axes["forward"],
                 axes["steer"],
                 buttons["a"],
-                buttons["y"],
+                buttons["s"],
                 buttons["x"],
                 buttons["b"],
             )

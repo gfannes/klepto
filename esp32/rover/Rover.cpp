@@ -41,7 +41,7 @@ void Rover::shoot(unsigned int shoot) {
     servo_shoot.write(70);
     delay(100);
     servo_shoot.write(0);
-    delay(100);
+    delay(300);
   }
 
   digitalWrite(flywheel_pin, LOW);
