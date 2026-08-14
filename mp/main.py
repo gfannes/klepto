@@ -1,4 +1,5 @@
 from mpos import Activity
+import mpos
 import lvgl as lv
 
 import network
@@ -21,6 +22,10 @@ BUTTON_KEYS = {
     10: "a",  # A button: shoot
     13: "a",
     3: "s",  # S button: double shoot control
+}
+EXPANDER_BUTTONS = {
+    "b": 6,
+    "x": 8,  # Physical Y button: tilt up command.
 }
 
 wlan = network.WLAN(network.STA_IF)
@@ -49,6 +54,14 @@ def setup_wifi_for_espnow():
 
 
 setup_wifi_for_espnow()
+
+
+def read_expander_digital():
+    try:
+        return tuple(mpos.io_expander.digital)
+    except Exception:
+        return None
+
 
 def ticks_ms():
     if hasattr(time, "ticks_ms"):
@@ -189,8 +202,18 @@ class Main(Activity):
 
         def update_buttons():
             now = ticks_ms()
+            expander_digital = read_expander_digital()
             for name in buttons:
-                buttons[name] = 1 if ticks_diff(button_expires[name], now) > 0 else 0
+                held_by_key = ticks_diff(button_expires[name], now) > 0
+                expander_index = EXPANDER_BUTTONS.get(name)
+                held_by_expander = False
+                if (
+                    expander_index is not None and
+                    expander_digital is not None and
+                    expander_index < len(expander_digital)
+                ):
+                    held_by_expander = bool(expander_digital[expander_index])
+                buttons[name] = 1 if held_by_key or held_by_expander else 0
 
         def update_axes():
             now = ticks_ms()
