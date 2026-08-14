@@ -1,0 +1,21 @@
+{
+  "name": "Klepto",
+  "publisher": "Fannes",
+  "short_description": "Klepto",
+  "long_description": "Klepto",
+  "fullname": "com.fannes.klepto",
+  "version": "0.1.0",
+  "category": "development",
+  "activities": [
+    {
+      "entrypoint": "main.py",
+      "classname": "Main",
+      "intent_filters": [
+        {
+          "action": "main",
+          "category": "launcher"
+        }
+      ]
+    }
+  ]
+}
