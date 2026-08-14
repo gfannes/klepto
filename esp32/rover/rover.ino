@@ -6,17 +6,8 @@
 
 Rover rover;
 
-#define BADGE_TEAM 1
 const int ESPNOW_CHANNEL = 1;
-const bool PAIR_FIRST_BADGE = true;
-
-#if BADGE_TEAM == 0
-// 34:85:18:AB:CF:38
-const uint8_t badge_mac[6] = {0x34, 0x85, 0x18, 0xAB, 0xCF, 0x38};
-#elif BADGE_TEAM == 1
-// 90:70:69:00:88:38
-const uint8_t badge_mac[6] = {0x90, 0x70, 0x69, 0x00, 0x88, 0x38};
-#endif
+const uint8_t ROVER_ID = 'A';
 
 typedef struct __attribute__((packed)) {
   int16_t joyX;
@@ -25,26 +16,18 @@ typedef struct __attribute__((packed)) {
   uint8_t b;
   uint8_t x;
   uint8_t y;
+  uint8_t roverId;
 } BadgeInput;
 
 const int CENTER = 2048;
 const int DEADZONE = 200;
 const int FULL_SCALE = 2048; 
 // -------------------------------------------------
-volatile BadgeInput received_packet = {2048, 2048, 0, 0, 0, 0};
-BadgeInput prevPacket = {2048, 2048, 0, 0, 0, 0};
+volatile BadgeInput received_packet = {2048, 2048, 0, 0, 0, 0, ROVER_ID};
+BadgeInput prevPacket = {2048, 2048, 0, 0, 0, 0, ROVER_ID};
 volatile bool newData = false;
 unsigned long lastSeen = 0;
 const unsigned long FAILSAFE_MS = 500;
-uint8_t paired_badge_mac[6] = {};
-bool hasPairedBadge = false;
-
-bool macEquals(const uint8_t *a, const uint8_t *b) {
-  for (int i = 0; i < 6; ++i)
-    if (a[i] != b[i])
-      return false;
-  return true;
-}
 
 void printMac(const char *label, const uint8_t *mac) {
   Serial.printf("%s%02X:%02X:%02X:%02X:%02X:%02X",
@@ -52,28 +35,18 @@ void printMac(const char *label, const uint8_t *mac) {
 }
 
 void handlePacket(const uint8_t *mac, const uint8_t *data, int len) {
-
+  (void)mac;
   if (len != sizeof(BadgeInput)) {
-    printMac("Ignoring packet with wrong size from ", mac);
-    Serial.printf(": got %d bytes, expected %u\n", len, (unsigned)sizeof(BadgeInput));
     return;
   }
 
-  if (!hasPairedBadge && PAIR_FIRST_BADGE) {
-    memcpy(paired_badge_mac, mac, sizeof(paired_badge_mac));
-    hasPairedBadge = true;
-    printMac("Paired badge ", paired_badge_mac);
-    Serial.println();
-  }
-
-  if (!hasPairedBadge || !macEquals(mac, paired_badge_mac)) {
-    printMac("Ignoring packet from ", mac);
-    printMac(", expected ", paired_badge_mac);
-    Serial.println();
+  BadgeInput packet;
+  memcpy(&packet, data, sizeof(packet));
+  if (packet.roverId != ROVER_ID) {
     return;
   }
 
-  memcpy((void *)&received_packet, data, sizeof(BadgeInput));
+  memcpy((void *)&received_packet, &packet, sizeof(BadgeInput));
   newData = true;
 }
 
@@ -111,14 +84,7 @@ void setup() {
   esp_read_mac(macRaw, ESP_MAC_WIFI_STA);
   printMac("Rover MAC: ", macRaw);
   Serial.println();
-  if (PAIR_FIRST_BADGE) {
-    Serial.println("Badge pairing: first valid 8-byte ESP-NOW packet wins");
-  } else {
-    memcpy(paired_badge_mac, badge_mac, sizeof(paired_badge_mac));
-    hasPairedBadge = true;
-    printMac("Badge MAC: ", paired_badge_mac);
-    Serial.println();
-  }
+  Serial.printf("Rover ID: %c\n", ROVER_ID);
   Serial.printf("ESP-NOW channel: %d (%s)\n",
                 ESPNOW_CHANNEL, channelResult == ESP_OK ? "ok" : "set failed");
   
@@ -154,11 +120,15 @@ void loop() {
     return;
   }
 
-  // if (pkt.a != prevPacket.a || pkt.b != prevPacket.b || pkt.x != prevPacket.x || pkt.y != prevPacket.y || pkt.joyX != prevPacket.joyX || pkt.joyY != prevPacket.joyY)
-  // {
-  //  Serial.printf("a: %d, b: %d, x: %d, y:%d, joyX:%d, joyY:%d\n", pkt.a, pkt.b, pkt.x, pkt.y, pkt.joyX, pkt.joyY);
-  //  memcpy(&prevPacket, (const void *)&pkt, sizeof(pkt));
-  //}
+  if (pkt.roverId != prevPacket.roverId || pkt.a != prevPacket.a || pkt.b != prevPacket.b ||
+      pkt.x != prevPacket.x || pkt.y != prevPacket.y || pkt.joyX != prevPacket.joyX ||
+      pkt.joyY != prevPacket.joyY)
+  {
+    Serial.printf("joyX:%d joyY:%d a:%u b:%u x:%u y:%u id:%c idByte:%u\n",
+                  pkt.joyX, pkt.joyY, pkt.a, pkt.b, pkt.x, pkt.y,
+                  (char)pkt.roverId, pkt.roverId);
+    memcpy(&prevPacket, (const void *)&pkt, sizeof(pkt));
+  }
 
 
   unsigned int to_shoot = 0;

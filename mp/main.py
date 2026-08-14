@@ -4,13 +4,11 @@ import lvgl as lv
 import network
 import espnow
 import ubinascii
-import binascii
 import struct
 import time
 
-# PEER_MAC = "B0CBD88975E8"
-# PEER_MAC = "B0CBD88975E9"
-PEER_MAC = "D4E9F4E6B754"
+ROVER_IDS = "ABCDEFGHIJK"
+BROADCAST_MAC = b"\xff\xff\xff\xff\xff\xff"
 ESP_NOW_CHANNEL = 1
 CENTER = 2048
 MIN_AXIS = 0
@@ -18,8 +16,10 @@ MAX_AXIS = 4095
 SEND_INTERVAL_MS = 100
 AXIS_HOLD_MS = 700
 BUTTON_HOLD_MS = 350
+SELECT_HOLD_MS = 1500
 BUTTON_KEYS = {
     10: "a",  # A button: shoot
+    13: "a",
     3: "y",  # S button: double shoot control; current rover firmware shoots 3
 }
 
@@ -85,15 +85,14 @@ class Main(Activity):
         label.align(lv.ALIGN.CENTER, 0, -60)
 
         badge_mac = ubinascii.hexlify(wlan.config("mac"), ":").decode()
-        rover_mac = ":".join(PEER_MAC[i:i + 2] for i in range(0, len(PEER_MAC), 2)).lower()
 
         mac_label = lv.label(screen)
         mac_label.align(lv.ALIGN.CENTER, 0, 60)
-        mac_label.set_text("badge %s\nrover %s" % (badge_mac, rover_mac))
+        mac_label.set_text("badge %s\nbroadcast ch %d" % (badge_mac, ESP_NOW_CHANNEL))
 
         status = lv.label(screen)
         status.align(lv.ALIGN.CENTER, 0, -10)
-        status.set_text("Connecting...")
+        status.set_text("Select rover")
 
         key_label = lv.label(screen)
         key_label.align(lv.ALIGN.CENTER, 0, 28)
@@ -107,17 +106,19 @@ class Main(Activity):
             e = espnow.ESPNow()
             e.active(True)
 
-            peer = binascii.unhexlify(PEER_MAC)
             try:
-                e.add_peer(peer, channel=ESP_NOW_CHANNEL)
+                e.add_peer(BROADCAST_MAC, channel=ESP_NOW_CHANNEL)
             except TypeError:
-                e.add_peer(peer)
+                e.add_peer(BROADCAST_MAC)
         except Exception as exc:
             label.set_text("Robot offline")
             status.set_text("Cannot add ESP-NOW peer\n%s" % exc)
             self.setContentView(screen)
             return
 
+        selected_rover_index = 0
+        rover_selected = False
+        select_expires = ticks_ms() + SELECT_HOLD_MS
         axes = {"forward": CENTER, "steer": CENTER}
         axis_expires = {"forward": 0, "steer": 0}
         button_expires = {"a": 0, "b": 0, "x": 0, "y": 0}
@@ -127,19 +128,35 @@ class Main(Activity):
         tx_count = 0
         fail_count = 0
 
+        def selected_rover_id():
+            return ROVER_IDS[selected_rover_index]
+
+        def update_select_screen():
+            label.set_text("Rover %s" % selected_rover_id())
+            status.set_text("Select rover\nleft/right, wait")
+
+        def start_control():
+            nonlocal rover_selected, last_packet
+            rover_selected = True
+            last_packet = None
+            label.set_text("Robot control")
+            send_state(True)
+
         def make_packet():
             return struct.pack(
-                "<hhBBBB",
+                "<hhBBBBB",
                 axes["forward"],
                 axes["steer"],
                 buttons["a"],
                 buttons["b"],
                 buttons["x"],
                 buttons["y"],
+                ord(selected_rover_id()),
             )
 
         def describe_state():
-            return "F=%d S=%d\nshoot=%d dbl=%d up=%d down=%d" % (
+            return "Rover %s F=%d S=%d\nshoot=%d dbl=%d up=%d down=%d" % (
+                selected_rover_id(),
                 axes["forward"],
                 axes["steer"],
                 buttons["a"],
@@ -150,21 +167,18 @@ class Main(Activity):
 
         def send_state(force=False):
             nonlocal last_packet, send_count, tx_count, fail_count
+            if not rover_selected:
+                return
             packet = make_packet()
             changed = packet != last_packet
             if not force and packet == last_packet:
                 return
             try:
-                delivered = e.send(peer, packet)
+                e.send(BROADCAST_MAC, packet)
             except Exception as exc:
                 fail_count += 1
                 send_label.set_text("sent: %d tx: %d fail: %d" % (send_count, tx_count, fail_count))
                 status.set_text("Send failed\n%s" % exc)
-                return
-            if delivered is False:
-                fail_count += 1
-                send_label.set_text("sent: %d tx: %d fail: %d" % (send_count, tx_count, fail_count))
-                status.set_text("No rover ACK")
                 return
             last_packet = packet
             tx_count += 1
@@ -185,14 +199,29 @@ class Main(Activity):
                     axes[name] = CENTER
 
         def heartbeat(timer):
+            nonlocal rover_selected
+            if not rover_selected and ticks_diff(ticks_ms(), select_expires) >= 0:
+                start_control()
             update_axes()
             update_buttons()
             send_state(True)
 
         def on_key(event):
+            nonlocal selected_rover_index, select_expires
             key = event.get_key()
             now = ticks_ms()
             key_label.set_text("key: %s name: %s" % (key, key_name(key)))
+            if not rover_selected:
+                if key in (lv.KEY.LEFT, lv.KEY.DOWN):
+                    selected_rover_index = (selected_rover_index - 1) % len(ROVER_IDS)
+                    select_expires = now + SELECT_HOLD_MS
+                    update_select_screen()
+                elif key in (lv.KEY.RIGHT, lv.KEY.UP):
+                    selected_rover_index = (selected_rover_index + 1) % len(ROVER_IDS)
+                    select_expires = now + SELECT_HOLD_MS
+                    update_select_screen()
+                return
+
             if key == lv.KEY.UP:
                 axes["forward"] = MAX_AXIS
                 axis_expires["forward"] = now + AXIS_HOLD_MS
@@ -221,5 +250,5 @@ class Main(Activity):
         lv.timer_create(heartbeat, SEND_INTERVAL_MS, None)
 
         self.setContentView(screen)
-        send_state(True)
+        update_select_screen()
         
