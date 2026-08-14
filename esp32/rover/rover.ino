@@ -7,7 +7,6 @@
 Rover rover;
 
 const int ESPNOW_CHANNEL = 1;
-const uint8_t ROVER_ID = 'A';
 
 typedef struct __attribute__((packed)) {
   int16_t joyX;
@@ -30,8 +29,8 @@ unsigned long lastSeen = 0;
 const unsigned long FAILSAFE_MS = 500;
 
 void printMac(const char *label, const uint8_t *mac) {
-  Serial.printf("%s%02X:%02X:%02X:%02X:%02X:%02X",
-                label, mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
+  ROVER_LOG_PRINTF("%s%02X:%02X:%02X:%02X:%02X:%02X",
+                   label, mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
 }
 
 void handlePacket(const uint8_t *mac, const uint8_t *data, int len) {
@@ -74,7 +73,13 @@ float normalize(int raw) {
 }
 
 void setup() {
-  Serial.begin(115200);
+  ROVER_LOG_BEGIN(115200);
+
+  ROVER_LOG_PRINT("Serial will be connection going down, rover uses serial pins for motor ...\n");
+  delay(100);
+  rover.setup();
+  delay(100);
+
   WiFi.mode(WIFI_STA);
   WiFi.disconnect();
   WiFi.setSleep(false);
@@ -83,21 +88,16 @@ void setup() {
   uint8_t macRaw[6];
   esp_read_mac(macRaw, ESP_MAC_WIFI_STA);
   printMac("Rover MAC: ", macRaw);
-  Serial.println();
-  Serial.printf("Rover ID: %c\n", ROVER_ID);
-  Serial.printf("ESP-NOW channel: %d (%s)\n",
-                ESPNOW_CHANNEL, channelResult == ESP_OK ? "ok" : "set failed");
+  ROVER_LOG_PRINTLN();
+  ROVER_LOG_PRINTF("Rover ID: %c\n", ROVER_ID);
+  ROVER_LOG_PRINTF("ESP-NOW channel: %d (%s)\n",
+                   ESPNOW_CHANNEL, channelResult == ESP_OK ? "ok" : "set failed");
   
   if (esp_now_init() != ESP_OK) {
-    Serial.println("ESP-NOW init failed");
+    ROVER_LOG_PRINTLN("ESP-NOW init failed");
     return;
   }
   esp_now_register_recv_cb(onRecv);
-
-  Serial.print("Serial will be connection going down, rover uses serial pins for motor ...\n");
-  delay(100);
-  rover.setup();
-  delay(100);
 
 }
 
@@ -124,9 +124,9 @@ void loop() {
       pkt.x != prevPacket.x || pkt.s != prevPacket.s || pkt.joyX != prevPacket.joyX ||
       pkt.joyY != prevPacket.joyY)
   {
-    Serial.printf("joyX:%d joyY:%d a:%u b:%u x:%u s:%u id:%c idByte:%u\n",
-                  pkt.joyX, pkt.joyY, pkt.a, pkt.b, pkt.x, pkt.s,
-                  (char)pkt.roverId, pkt.roverId);
+    ROVER_LOG_PRINTF("joyX:%d joyY:%d a:%u b:%u x:%u s:%u id:%c idByte:%u\n",
+                     pkt.joyX, pkt.joyY, pkt.a, pkt.b, pkt.x, pkt.s,
+                     (char)pkt.roverId, pkt.roverId);
     memcpy(&prevPacket, (const void *)&pkt, sizeof(pkt));
   }
 
@@ -138,7 +138,7 @@ void loop() {
     to_shoot = 3;
 
   if (to_shoot) {
-    Serial.println("shoot");
+    ROVER_LOG_PRINTLN("shoot");
     rover.drive(0, 0);
     rover.shoot(to_shoot);
   } else {
@@ -166,11 +166,11 @@ void loop() {
     right = -right;
 
     if (false) {
-      Serial.print(left);
-      Serial.print(' ');
-      Serial.print(right);
-      Serial.print(' ');
-      Serial.println("");
+      ROVER_LOG_PRINT(left);
+      ROVER_LOG_PRINT(' ');
+      ROVER_LOG_PRINT(right);
+      ROVER_LOG_PRINT(' ');
+      ROVER_LOG_PRINTLN("");
     }
     
     rover.drive(left, right);

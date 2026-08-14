@@ -4,6 +4,24 @@
 #include <ESP32Servo.h>
 #include "Arduino.h"
 
+#ifndef ENABLE_ROVER_LOGGING
+#define ENABLE_ROVER_LOGGING 0
+#endif
+
+const uint8_t ROVER_ID = 'A';
+
+#if ENABLE_ROVER_LOGGING
+#define ROVER_LOG_BEGIN(...) Serial.begin(__VA_ARGS__)
+#define ROVER_LOG_PRINT(...) Serial.print(__VA_ARGS__)
+#define ROVER_LOG_PRINTLN(...) Serial.println(__VA_ARGS__)
+#define ROVER_LOG_PRINTF(...) Serial.printf(__VA_ARGS__)
+#else
+#define ROVER_LOG_BEGIN(...)
+#define ROVER_LOG_PRINT(...)
+#define ROVER_LOG_PRINTLN(...)
+#define ROVER_LOG_PRINTF(...)
+#endif
+
 class Rover
 {
 public:
@@ -15,7 +33,7 @@ public:
     void tilt_down();
 
 private:
-#if 0
+#if 1
     const int flywheel_pin = 33;
     // const int motor_a_in1 = 1;
     // const int motor_a_in2 = 3;

@@ -1,7 +1,7 @@
 #include <Rover.hpp>
 
 void Rover::setup() {
-  Serial.println("Rover.setup()");
+  ROVER_LOG_PRINTLN("Rover.setup()");
 
   pinMode(flywheel_pin, OUTPUT);
 
@@ -10,7 +10,7 @@ void Rover::setup() {
   servo_shoot.setPeriodHertz(50);
   const bool okk1 = servo_tilt.attach(servo_tilt_pin, 500, 2400);
   const bool okk2 = servo_shoot.attach(servo_shoot_pin, 500, 2400);
-  Serial.printf("Servo attach: %d %d\n", okk1, okk2);
+  ROVER_LOG_PRINTF("Servo attach: %d %d\n", okk1, okk2);
   tilt_degrees = tilt_degree_down;
   servo_tilt.write(tilt_degrees);
   servo_shoot.write(0);
@@ -22,7 +22,7 @@ void Rover::setup() {
   const bool ok2 = ledcAttach(motor_a_in2, pwm_freq, pwm_res);
   const bool ok3 = ledcAttach(motor_b_in1, pwm_freq, pwm_res);
   const bool ok4 = ledcAttach(motor_b_in2, pwm_freq, pwm_res);
-  Serial.printf("Motor ledcAttach: %d %d %d %d\n", ok1, ok2, ok3, ok4);  
+  ROVER_LOG_PRINTF("Motor ledcAttach: %d %d %d %d\n", ok1, ok2, ok3, ok4);
 
 
 

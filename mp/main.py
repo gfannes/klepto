@@ -115,19 +115,33 @@ class Main(Activity):
         send_label.align(lv.ALIGN.CENTER, 0, 44)
         send_label.set_text("sent: 0 tx: 0 fail: 0")
 
-        try:
-            e = espnow.ESPNow()
-            e.active(True)
+        e = None
 
+        def reset_espnow(report_errors=True):
+            nonlocal e
+            if e is not None:
+                try:
+                    e.active(False)
+                except Exception:
+                    pass
             try:
-                e.add_peer(BROADCAST_MAC, channel=ESP_NOW_CHANNEL)
-            except TypeError:
-                e.add_peer(BROADCAST_MAC)
-        except Exception as exc:
-            label.set_text("Robot offline")
-            status.set_text("Cannot add ESP-NOW peer\n%s" % exc)
-            self.setContentView(screen)
-            return
+                setup_wifi_for_espnow()
+                e = espnow.ESPNow()
+                e.active(True)
+                try:
+                    e.add_peer(BROADCAST_MAC, channel=ESP_NOW_CHANNEL)
+                except TypeError:
+                    e.add_peer(BROADCAST_MAC)
+                return True
+            except Exception as exc:
+                e = None
+                if report_errors:
+                    print("ESP-NOW reset failed:", exc)
+                    send_label.set_text("ESP-NOW reset failed")
+                return False
+
+        if not reset_espnow(False):
+            status.set_text("ESP-NOW unavailable\ncontrols active")
 
         selected_rover_index = 0
         rover_selected = False
@@ -136,7 +150,6 @@ class Main(Activity):
         axis_expires = {"forward": 0, "steer": 0}
         button_expires = {"a": 0, "b": 0, "x": 0, "s": 0}
         buttons = {"a": 0, "b": 0, "x": 0, "s": 0}
-        last_packet = None
         send_count = 0
         tx_count = 0
         fail_count = 0
@@ -149,9 +162,8 @@ class Main(Activity):
             status.set_text("Select rover\nleft/right, wait")
 
         def start_control():
-            nonlocal rover_selected, last_packet
+            nonlocal rover_selected
             rover_selected = True
-            last_packet = None
             label.set_text("Robot control")
             send_state(True)
 
@@ -179,24 +191,26 @@ class Main(Activity):
             )
 
         def send_state(force=False):
-            nonlocal last_packet, send_count, tx_count, fail_count
+            nonlocal send_count, tx_count, fail_count
             if not rover_selected:
                 return
             packet = make_packet()
-            changed = packet != last_packet
-            if not force and packet == last_packet:
+            if e is None and not reset_espnow():
+                fail_count += 1
+                send_label.set_text("sent: %d tx: %d fail: %d" % (send_count, tx_count, fail_count))
+                status.set_text(describe_state())
                 return
             try:
                 e.send(BROADCAST_MAC, packet)
             except Exception as exc:
                 fail_count += 1
+                print("ESP-NOW send failed:", exc)
+                reset_espnow()
                 send_label.set_text("sent: %d tx: %d fail: %d" % (send_count, tx_count, fail_count))
-                status.set_text("Send failed\n%s" % exc)
+                status.set_text(describe_state())
                 return
-            last_packet = packet
             tx_count += 1
-            if changed:
-                send_count += 1
+            send_count += 1
             send_label.set_text("sent: %d tx: %d fail: %d" % (send_count, tx_count, fail_count))
             status.set_text(describe_state())
 
