@@ -14,11 +14,12 @@ PEER_MAC = "B0CBD88975E8"
 CENTER = 2048
 MIN_AXIS = 0
 MAX_AXIS = 4095
+SEND_INTERVAL_MS = 100
 BUTTON_KEYS = {
     "a": "a",  # shoot
     "b": "b",  # tilt down
-    "s": "x",  # double shoot
-    "y": "y",  # tilt up
+    "s": "y",  # double shoot in the requested controls; rover currently shoots 3
+    "y": "x",  # tilt up in the current rover firmware
 }
 
 
@@ -77,12 +78,12 @@ class Main(Activity):
         last_packet = None
 
         def make_packet():
-            left_right = axis_value(keys_down[lv.KEY.LEFT], keys_down[lv.KEY.RIGHT])
-            fwd_bckwd = axis_value(keys_down[lv.KEY.DOWN], keys_down[lv.KEY.UP])
+            forward = axis_value(keys_down[lv.KEY.DOWN], keys_down[lv.KEY.UP])
+            steer = axis_value(keys_down[lv.KEY.LEFT], keys_down[lv.KEY.RIGHT])
             return struct.pack(
                 "<hhBBBB",
-                left_right,
-                fwd_bckwd,
+                forward,
+                steer,
                 buttons["a"],
                 buttons["b"],
                 buttons["x"],
@@ -90,21 +91,21 @@ class Main(Activity):
             )
 
         def describe_state():
-            lr = axis_value(keys_down[lv.KEY.LEFT], keys_down[lv.KEY.RIGHT])
-            fb = axis_value(keys_down[lv.KEY.DOWN], keys_down[lv.KEY.UP])
-            return "LR=%d FB=%d\nshoot=%d dbl=%d up=%d down=%d" % (
-                lr,
-                fb,
+            forward = axis_value(keys_down[lv.KEY.DOWN], keys_down[lv.KEY.UP])
+            steer = axis_value(keys_down[lv.KEY.LEFT], keys_down[lv.KEY.RIGHT])
+            return "F=%d S=%d\nshoot=%d dbl=%d up=%d down=%d" % (
+                forward,
+                steer,
                 buttons["a"],
-                buttons["x"],
                 buttons["y"],
+                buttons["x"],
                 buttons["b"],
             )
 
-        def send_state():
+        def send_state(force=False):
             nonlocal last_packet
             packet = make_packet()
-            if packet == last_packet:
+            if not force and packet == last_packet:
                 return
             try:
                 e.send(peer, packet)
@@ -130,7 +131,8 @@ class Main(Activity):
         lv.group_get_default().add_obj(screen)
         lv.group_focus_obj(screen)
         screen.add_event_cb(on_key, lv.EVENT.KEY, None)
+        lv.timer_create(lambda timer: send_state(True), SEND_INTERVAL_MS, None)
 
         self.setContentView(screen)
-        send_state()
+        send_state(True)
         
