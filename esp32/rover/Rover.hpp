@@ -15,7 +15,7 @@ public:
     void tilt_down();
 
 private:
-#if 1
+#if 0
     const int flywheel_pin = 33;
     // const int motor_a_in1 = 1;
     // const int motor_a_in2 = 3;
