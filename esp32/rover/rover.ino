@@ -42,8 +42,6 @@ bool macEquals(const uint8_t *a, const uint8_t *b) {
 }
 
 void handlePacket(const uint8_t *mac, const uint8_t *data, int len) {
-
-  Serial.printf("Received %d bytes\n", len);
   if (!macEquals(mac, badge_mac))
     return;
   if (len != sizeof(BadgeInput))
@@ -120,11 +118,11 @@ void loop() {
     return;
   }
 
-  if (pkt.a != prevPacket.a || pkt.b != prevPacket.b || pkt.x != prevPacket.x || pkt.y != prevPacket.y || pkt.joyX != prevPacket.joyX || pkt.joyY != prevPacket.joyY)
-  {
-    Serial.printf("a: %d, b: %d, x: %d, y:%d, joyX:%d, joyY:%d\n", pkt.a, pkt.b, pkt.x, pkt.y, pkt.joyX, pkt.joyY);
-    memcpy(&prevPacket, (const void *)&pkt, sizeof(pkt));
-  }
+  // if (pkt.a != prevPacket.a || pkt.b != prevPacket.b || pkt.x != prevPacket.x || pkt.y != prevPacket.y || pkt.joyX != prevPacket.joyX || pkt.joyY != prevPacket.joyY)
+  // {
+  //  Serial.printf("a: %d, b: %d, x: %d, y:%d, joyX:%d, joyY:%d\n", pkt.a, pkt.b, pkt.x, pkt.y, pkt.joyX, pkt.joyY);
+  //  memcpy(&prevPacket, (const void *)&pkt, sizeof(pkt));
+  //}
 
 
   unsigned int to_shoot = 0;
