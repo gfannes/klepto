@@ -1,11 +1,11 @@
 {
-  "name": "Klepto",
+  "name": "Klepto Rover",
   "publisher": "Fannes",
-  "short_description": "Klepto",
-  "long_description": "Klepto",
+  "short_description": "Drive a Klepto Mars rover from the badge",
+  "long_description": "Controller for the Klepto Mars rover. Pick rover A–K, then use the joystick to drive, Y/B to aim, A to shoot once, and S for a 3-shot burst. Sends ESP-NOW packets on channel 1.",
   "fullname": "com.fannes.klepto",
-  "version": "0.1.0",
-  "category": "development",
+  "version": "0.2.0",
+  "category": "Games",
   "activities": [
     {
       "entrypoint": "main.py",
